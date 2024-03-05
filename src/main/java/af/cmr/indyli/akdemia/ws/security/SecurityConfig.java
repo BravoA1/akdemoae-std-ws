@@ -1,0 +1,66 @@
+package af.cmr.indyli.akdemia.ws.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import af.cmr.indyli.akdemia.business.utils.AkdemiaConstantes.AkdemiaConstantesService;
+import jakarta.annotation.Resource;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+@ComponentScan(basePackages = "af.cmr.indyli.akdemia.ws.*")
+public class SecurityConfig {
+	
+	@Autowired
+	private JwtAuthenticationFilter authFilter;
+
+	@Resource(name = AkdemiaConstantesService.USER_SERVICE_KEY)
+	private UserDetailsService userDetailsService;
+
+	public SecurityConfig(JwtAuthenticationFilter authFilter) {
+		this.authFilter = authFilter;
+	}
+
+	// Configuring HttpSecurity
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		return http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests((request) -> request
+				.requestMatchers("/token/*", "/token/is-token-valid", "/signup")
+				.permitAll().anyRequest().permitAll())
+				.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class).build();
+	}
+
+	// Password Encoding
+	@Bean
+    public BCryptPasswordEncoder bcryptEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+		authenticationProvider.setUserDetailsService(this.userDetailsService);
+		authenticationProvider.setPasswordEncoder(bcryptEncoder());
+		return authenticationProvider;
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
+	}
+}

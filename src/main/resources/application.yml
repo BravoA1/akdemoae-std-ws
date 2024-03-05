@@ -1,0 +1,9 @@
+### Context root path ########
+server:
+  servlet:
+    context-path: /api
+  port: 8081
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
