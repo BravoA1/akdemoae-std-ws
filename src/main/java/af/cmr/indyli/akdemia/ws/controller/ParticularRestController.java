@@ -34,7 +34,7 @@ public class ParticularRestController {
 
 
 	@RequestMapping(value=AkdemiaConstantesURI.PATH_PARTICULAR_ID,method = RequestMethod.GET)
-	public ResponseEntity<ParticularDto> getParticularById(@PathVariable Integer particularId)  {
+	public ResponseEntity<ParticularDto> getParticularById(@PathVariable("particularId") Integer particularId)  {
 		ParticularDto foundExposedAlerte = null;
 		try {
 			foundExposedAlerte = particularService.findById(particularId);
@@ -45,7 +45,7 @@ public class ParticularRestController {
 	}
 
 	@RequestMapping(value=AkdemiaConstantesURI.PATH_PARTICULAR_ID,method = RequestMethod.DELETE)
-	public ResponseEntity<Void> deleteParticularById(@PathVariable Integer particularId)  {
+	public ResponseEntity<Void> deleteParticularById(@PathVariable("particularId") Integer particularId)  {
 		try {
 			particularService.deleteById(particularId);
 		} catch (AkdemiaBusinessException e) {
@@ -66,13 +66,16 @@ public class ParticularRestController {
 
 	@PutMapping(value = AkdemiaConstantesURI.PATH_PARTICULAR_ID,
 			consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Void> updateParticular(@RequestBody ParticularDto particular, @PathVariable("particularId") Integer particularId) {
-		try {
-			this.particularService.update(particular);
-		} catch (AkdemiaBusinessException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	public ResponseEntity<ParticularDto> updateParticular(@RequestBody ParticularDto particular, @PathVariable("particularId") Integer particularId) throws AkdemiaBusinessException {
+		
+		ParticularDto particularOne = this.particularService.findById(particularId);
+		if(particularOne == null) {
+			return ResponseEntity.notFound().build(); 
 		}
-		return ResponseEntity.noContent().build();
+	  
+		ParticularDto updateNewParticular =  this.particularService.update(particular);
+	  
+		return ResponseEntity.ok().body(updateNewParticular);
 	}
 	
 }

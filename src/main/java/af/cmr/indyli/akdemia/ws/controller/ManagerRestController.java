@@ -35,7 +35,7 @@ public class ManagerRestController {
 
 
 	@RequestMapping(value=AkdemiaConstantesURI.PATH_MANAGER_ID,method = RequestMethod.GET)
-	public ResponseEntity<ManagerDto> getManagerById(@PathVariable Integer managerId)  {
+	public ResponseEntity<ManagerDto> getManagerById(@PathVariable("managerId") Integer managerId)  {
 		ManagerDto foundExposedAlerte = null;
 		try {
 			foundExposedAlerte = managerService.findById(managerId);
@@ -46,7 +46,7 @@ public class ManagerRestController {
 	}
 
 	@RequestMapping(value=AkdemiaConstantesURI.PATH_MANAGER_ID,method = RequestMethod.DELETE)
-	public ResponseEntity<Void> deleteManagerById(@PathVariable Integer managerId)  {
+	public ResponseEntity<Void> deleteManagerById(@PathVariable("managerId") Integer managerId)  {
 		try {
 			managerService.deleteById(managerId);
 		} catch (AkdemiaBusinessException e) {
@@ -67,13 +67,16 @@ public class ManagerRestController {
 
 	@PutMapping(value = AkdemiaConstantesURI.PATH_MANAGER_ID,
 			consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Void> updateManager(@RequestBody ManagerDto manager, @PathVariable("managerId") Integer managerId) {
-		try {
-			this.managerService.update(manager);
-		} catch (AkdemiaBusinessException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	public ResponseEntity<ManagerDto> updateManager(@RequestBody ManagerDto manager, @PathVariable("managerId") Integer managerId) throws AkdemiaBusinessException {
+		
+		ManagerDto managerOne = this.managerService.findById(managerId);
+		if(managerOne == null) {
+			return ResponseEntity.notFound().build(); 
 		}
-		return ResponseEntity.noContent().build();
+	  
+		ManagerDto updateNewManager =  this.managerService.update(manager);
+	  
+		return ResponseEntity.ok().body(updateNewManager);
 	}
 	
 }
