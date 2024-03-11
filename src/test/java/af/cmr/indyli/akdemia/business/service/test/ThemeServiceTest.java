@@ -23,103 +23,88 @@ import jakarta.annotation.Resource;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AkdemiaStdWsApplication.class)
 public class ThemeServiceTest {
-	
-	@Resource(name = AkdemiaConstantesService.THEME_SERVICE_KEY)
-    IThemeService themeService;
-	
-	private Integer themeIdForAllTest = null;
-	private Integer themeIdCreateTest = null;
-	
-	@Test
-	public void testCreateThemeWithSuccess() throws AkdemiaBusinessException {
-		
-		// Given
-		ThemeDto theme = new ThemeDto();
-		
-		theme.setThemeTitle("PHP Langage");
-		theme.setDescription("Langage de programmation...");
-		theme.setCreationDate(new Date());
-		
-		theme = this.themeService.create(theme);
-		Assert.assertNotNull(theme.getId());
-		
-		this.themeIdCreateTest = theme.getId();
 
-	}
-	
-	@Test
-	public void testFindAllThemetsWithSuccess() {
-		// Given
-		// When
-		List<ThemeDto> themes = this.themeService.findAll();
+    @Resource(name = AkdemiaConstantesService.THEME_SERVICE_KEY)
+    private IThemeService themeService;
 
-		// Then
-		Assert.assertTrue(themes.size() > 0);
-	}
-	
-	@Test
-	public void testFindByIdWithSuccess() throws AkdemiaBusinessException {
-		// Given
-		Integer themeId = this.themeIdForAllTest;
+    private Integer themeIdForAllTest;
+    private Integer themeIdCreateTest;
 
-		// When
-		ThemeDto theme = this.themeService.findById(themeId);
+    @Before
+    public void prepareAllEntityBefore() throws AkdemiaBusinessException {
+        // Création du thème
+        ThemeDto theme = createTheme("PHP Langage", "Langage de programmation...");
+        theme = this.themeService.create(theme);
+        Assert.assertNotNull(theme.getId());
+        this.themeIdForAllTest = theme.getId();
+    }
 
-		// Then
-		Assert.assertNotNull(theme);
-	}
-	
-	@Test
-	public void testDeleteThemeWithSuccess() throws AccessDeniedException, AkdemiaBusinessException {
-		// Given
-		Integer themeId = this.themeIdForAllTest;
-		themeIdForAllTest = null;
-		// When
-		this.themeService.deleteById(themeId);
+    @Test
+    public void testCreateThemeWithSuccess() throws AkdemiaBusinessException {
+        // Given
+        ThemeDto theme = createTheme("PHP Langage", "Langage de programmation...");
+        // When
+        theme = this.themeService.create(theme);
+        Assert.assertNotNull(theme.getId());
+        this.themeIdCreateTest = theme.getId();
+    }
 
-		// Then
-		ThemeDto theme = this.themeService.findById(themeId);
-		Assert.assertNull(theme);
-	}
-	
-	@Test
-	public void testUpdateTheme() throws AccessDeniedException, AkdemiaBusinessException {
-		// Given
-		ThemeDto theme = this.themeService.findById(this.themeIdForAllTest);
-		theme.setThemeTitle("PHP Laravel Vol 2");
-		// When
-		this.themeService.update(theme);
-		ThemeDto themeUpdate = this.themeService.findById(this.themeIdForAllTest);
-		// Then
+    @Test
+    public void testFindAllThemesWithSuccess() {
+        // When
+        List<ThemeDto> themes = this.themeService.findAll();
+        // Then
+        Assert.assertTrue(themes.size() > 0);
+    }
 
-		Assert.assertTrue(themeUpdate.getThemeTitle() == "PHP Laravel Vol 2");
-	}
-	
-	
-	@Before
-	public void prepareAllEntityBefore() throws AkdemiaBusinessException {
- 
-		// creation theme
-		ThemeDto theme = new ThemeDto();
-		
-		theme.setThemeTitle("PHP Langage");
-		theme.setDescription("Langage de programmation...");
-		theme.setCreationDate(new Date());
-		
-		theme = this.themeService.create(theme);
+    @Test
+    public void testFindByIdWithSuccess() throws AkdemiaBusinessException {
+        // Given
+        Integer themeId = this.themeIdForAllTest;
+        // When
+        ThemeDto theme = this.themeService.findById(themeId);
+        // Then
+        Assert.assertNotNull(theme);
+    }
 
-		Assert.assertNotNull(theme.getId());
+    @Test
+    public void testDeleteThemeWithSuccess() throws AccessDeniedException, AkdemiaBusinessException {
+        // Given
+        Integer themeId = this.themeIdForAllTest;
+        // When
+        this.themeService.deleteById(themeId);
+        // Then
+        ThemeDto theme = this.themeService.findById(themeId);
+        Assert.assertNull(theme);
+    }
 
-		this.themeIdForAllTest = theme.getId();
-	}
-	
-	@After
-	public void deleteAllEntityAfter() throws AkdemiaBusinessException, AccessDeniedException {
-		if (!Objects.isNull(this.themeIdCreateTest)) {
-			this.themeService.deleteById(this.themeIdForAllTest);
-		}
-		if (!Objects.isNull(this.themeIdCreateTest)) {
-			this.themeService.deleteById(this.themeIdCreateTest);
-		}
-	}
+    @Test
+    public void testUpdateTheme() throws AccessDeniedException, AkdemiaBusinessException {
+        // Given
+        ThemeDto theme = this.themeService.findById(this.themeIdForAllTest);
+        theme.setThemeTitle("PHP Laravel Vol 2");
+        // When
+        this.themeService.update(theme);
+        ThemeDto themeUpdate = this.themeService.findById(this.themeIdForAllTest);
+        // Then
+        Assert.assertEquals("PHP Laravel Vol 2", themeUpdate.getThemeTitle());
+    }
+
+    @After
+    public void deleteAllEntityAfter() throws AkdemiaBusinessException, AccessDeniedException {
+        if (!Objects.isNull(this.themeIdForAllTest)) {
+            this.themeService.deleteById(this.themeIdForAllTest);
+        }
+        if (!Objects.isNull(this.themeIdCreateTest)) {
+            this.themeService.deleteById(this.themeIdCreateTest);
+        }
+    }
+
+    private ThemeDto createTheme(String title, String description) throws AkdemiaBusinessException {
+        ThemeDto theme = new ThemeDto();
+        theme.setThemeTitle(title);
+        theme.setDescription(description);
+        theme.setCreationDate(new Date());
+        return theme;
+    }
 }

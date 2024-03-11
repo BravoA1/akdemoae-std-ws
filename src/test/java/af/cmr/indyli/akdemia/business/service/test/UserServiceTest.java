@@ -24,111 +24,110 @@ import jakarta.annotation.Resource;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AkdemiaStdWsApplication.class)
 public class UserServiceTest {
-	
-	@Resource(name = AkdemiaConstantesService.USER_SERVICE_KEY)
-    IUserService userService;
-	
-	private Integer userIdForAllTest = null;
-	private Integer createUserId = null;
-	
-	private BCryptPasswordEncoder bcryptEncoder;
-	
-	@Test
-	public void createUserId() throws AkdemiaBusinessException {
-		UserDto user = new UserDto();
-		bcryptEncoder = new BCryptPasswordEncoder();
-		
-		user.setAddress("Paris, France");
-		user.setEmail("cedric.emana@indyli-services.com");
-		user.setPhone("0398521647");
-		user.setCreationDate(new Date());
-		user.setLogin("cedric");
-		String encryptPassword = this.bcryptEncoder.encode("1234");
-		user.setPassword(encryptPassword);
-		
-		user = userService.create(user);
-		this.createUserId = user.getId();
-	}
-	
-	@Test
-	public void testFindAllUserWithSuccess() {
-		// Given
-		// When
-		List<UserDto> users = this.userService.findAll();
-		// Then
-		Assert.assertTrue(users.size() > 0);
-	}
-	
-	@Test
-	public void testFindByIdWithSuccess() throws AkdemiaBusinessException {
-		// Given
-		Integer userId = this.userIdForAllTest;
-		// When
-		UserDto user = this.userService.findById(userId);
-		// Then
-		Assert.assertTrue(user.getId() == userId);
-	}
-	
-	@Test
-	public void testUpdateUser() throws AccessDeniedException, AkdemiaBusinessException {
-		// Given
-		UserDto user = this.userService.findById(this.userIdForAllTest);
-		user.setPhone("06854263985");
-		// When
-		this.userService.update(user);
-		UserDto userUpdate = this.userService.findById(this.userIdForAllTest);
-		// Then
 
-		Assert.assertTrue(userUpdate.getPhone() == "06854263985");
-	}
-	
-	@Test
-	public void testDelete() throws AccessDeniedException, Exception {
-		// Given
-		Integer userId = this.userIdForAllTest;
-		this.userIdForAllTest = null;
-		// Whens
-		this.userService.deleteById(userId);
-		UserDto user = this.userService.findById(userId);
+    @Resource(name = AkdemiaConstantesService.USER_SERVICE_KEY)
+    private IUserService userService;
 
-		// Then
-		Assert.assertNull(user);
+    private Integer userIdForAllTest;
+    private Integer createUserId;
 
-	}
-	
-	@Test
-	public void testGetUserByEmail() throws AkdemiaBusinessException{
-		 //Recuperation par email
-		UserDto user = userService.findByEmail("Jacques@example.com");
-        System.out.println("User authentifié :" + user);
-        Assert.assertTrue(user != null);
-	}
-	
-	@Before
-	public void prepareAllEntityBefore() throws AkdemiaBusinessException {
-		bcryptEncoder = new BCryptPasswordEncoder();
-		UserDto user = new UserDto();
-		user.setAddress("Paris, France");
-		user.setEmail("zoyim.loti@indyli-services.com");
-		user.setPhone("0398521647");
-		user.setCreationDate(new Date());
-		user.setLogin("aziz");
-		String encryptPassword = bcryptEncoder.encode("1234");
-		user.setPassword(encryptPassword);
-		
-		user = userService.create(user);
-		this.userIdForAllTest = user.getId();
-	}
-	
-	@After
-	public void deleteAllEntityAfter() throws AccessDeniedException, AkdemiaBusinessException {
-		if (this.userIdForAllTest != null) {
-			this.userService.deleteById(this.userIdForAllTest);
-		}
+    private BCryptPasswordEncoder bcryptEncoder;
 
-		if (!Objects.isNull(this.createUserId)) {
-			this.userService.deleteById(this.createUserId);
-		}
-	}
+    @Before
+    public void setUp() throws AkdemiaBusinessException {
+        // Création de l'utilisateur de test avant chaque test
+        UserDto user = createUser("zoyim.loti@indyli-services.com", "Paris, France", "aziz", "0398521647", "1234");
+        user = this.userService.create(user);
+        Assert.assertNotNull(user.getId());
+        this.userIdForAllTest = user.getId();
+    }
 
+    @Test
+    public void testCreateUserId() throws AkdemiaBusinessException {
+        // Given
+        UserDto user = createUser("cedric.emana@indyli-services.com", "Paris, France", "cedric", "0398521647", "1234");
+        // When
+        user = this.userService.create(user);
+        Assert.assertNotNull(user.getId());
+        this.createUserId = user.getId();
+    }
+
+    @Test
+    public void testFindAllUserWithSuccess() {
+        // When
+        List<UserDto> users = this.userService.findAll();
+        // Then
+        Assert.assertTrue(users.size() > 0);
+    }
+
+    @Test
+    public void testFindByIdWithSuccess() throws AkdemiaBusinessException {
+        // Given
+        Integer userId = this.userIdForAllTest;
+        // When
+        UserDto user = this.userService.findById(userId);
+        // Then
+        Assert.assertTrue(user.getId() == userId);
+    }
+
+    @Test
+    public void testUpdateUser() throws AccessDeniedException, AkdemiaBusinessException {
+        // Given
+        UserDto user = this.userService.findById(this.userIdForAllTest);
+        user.setPhone("06854263985");
+        // When
+        this.userService.update(user);
+        UserDto userUpdate = this.userService.findById(this.userIdForAllTest);
+        // Then
+        Assert.assertEquals("06854263985", userUpdate.getPhone());
+    }
+
+    @Test
+    public void testDelete() throws AccessDeniedException, AkdemiaBusinessException {
+        // Given
+        Integer userId = this.userIdForAllTest;
+        this.userIdForAllTest = null;
+        // When
+        this.userService.deleteById(userId);
+        UserDto user = this.userService.findById(userId);
+        // Then
+        Assert.assertNull(user);
+    }
+
+    @Test
+    public void testGetUserByEmail() throws AkdemiaBusinessException {
+        // Given
+        String email = "Jacques@example.com";
+        // When
+        UserDto user = userService.findByEmail(email);
+        // Then
+        Assert.assertNotNull(user);
+        Assert.assertEquals(email, user.getEmail());
+    }
+
+    @After
+    public void tearDown() throws AkdemiaBusinessException, AccessDeniedException {
+        // Supprimer les utilisateurs créés lors des tests
+        if (!Objects.isNull(this.userIdForAllTest)) {
+            this.userService.deleteById(this.userIdForAllTest);
+        }
+
+        if (!Objects.isNull(this.createUserId)) {
+            this.userService.deleteById(this.createUserId);
+        }
+    }
+
+    private UserDto createUser(String email, String address, String login, String phone, String password) throws AkdemiaBusinessException {
+        bcryptEncoder = new BCryptPasswordEncoder();
+        UserDto user = new UserDto();
+        user.setAddress(address);
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setCreationDate(new Date());
+        user.setLogin(login);
+        String encryptPassword = bcryptEncoder.encode(password);
+        user.setPassword(encryptPassword);
+        return user;
+    }
 }
+

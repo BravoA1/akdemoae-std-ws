@@ -1,10 +1,5 @@
 package af.cmr.indyli.akdemia.business.service.test;
 
-import java.nio.file.AccessDeniedException;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,127 +16,106 @@ import af.cmr.indyli.akdemia.business.utils.AkdemiaConstantes.AkdemiaConstantesS
 import af.cmr.indyli.akdemia.ws.boot.AkdemiaStdWsApplication;
 import jakarta.annotation.Resource;
 
+import java.nio.file.AccessDeniedException;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AkdemiaStdWsApplication.class)
 public class ParticularServiceTest {
 
-	@Resource(name = AkdemiaConstantesService.PARTICULAR_SERVICE_KEY)
-    IParticularService particularService;
-	
-	private BCryptPasswordEncoder bcryptEncoder;
-	
-	private Integer particularIdForAllTest = null;
-	private Integer particularIdCreateTest = null;
-	
-	@Test
-	public void testCreateParticularWithSuccess() throws AkdemiaBusinessException {
-		
-		// Given
-		ParticularDto particular = new ParticularDto();
-		bcryptEncoder = new BCryptPasswordEncoder();
-		
-		particular.setFirstname("Daria");
-		particular.setLastname("Manuella");
-		particular.setGender("F");
-		particular.setActivity("Stagiaire");
-		particular.setHighestDiploma("Master");
-		particular.setBirthDate(new Date());
-		particular.setLogin("daria");
-		particular.setPassword(this.bcryptEncoder.encode("1234"));
-		particular.setEmail("dariamanuella@gmail.com");
-		particular.setAddress("Paris, France");
-		particular.setPhone("06974582");
-		particular.setCreationDate(new Date());
-		
-		particular = this.particularService.create(particular);
-		Assert.assertNotNull(particular.getId());
-		
-		this.particularIdCreateTest = particular.getId();
+    @Resource(name = AkdemiaConstantesService.PARTICULAR_SERVICE_KEY)
+    private IParticularService particularService;
 
-	}
-	
-	@Test
-	public void testFindAllParticularsWithSuccess() {
-		// Given
-		// When
-		List<ParticularDto> particulars = this.particularService.findAll();
+    private BCryptPasswordEncoder bcryptEncoder = new BCryptPasswordEncoder();
+    private Integer particularIdForAllTest;
+    private Integer particularIdCreateTest;
 
-		// Then
-		Assert.assertTrue(particulars.size() > 0);
-	}
-	
-	@Test
-	public void testFindByIdWithSuccess() throws AkdemiaBusinessException {
-		// Given
-		Integer particularId = this.particularIdForAllTest;
-		// When
-		ParticularDto particular = this.particularService.findById(particularId);
-		// Then
-		Assert.assertTrue(particular.getId() == particularId);
-	}
-	
-	@Test
-	public void testDeleteParticularWithSuccess() throws AccessDeniedException, AkdemiaBusinessException {
-		// Given
-		Integer particularId = this.particularIdForAllTest;
-		particularIdForAllTest = null;
-		// When
-		this.particularService.deleteById(particularId);
+    @Before
+    public void prepareAllEntityBefore() throws AkdemiaBusinessException {
 
-		// Then
-		ParticularDto particular = this.particularService.findById(particularId);
-		Assert.assertNull(particular);
-	}
-	
-	@Test
-	public void testUpdateParticular() throws AccessDeniedException, AkdemiaBusinessException {
-		// Given
-		ParticularDto particular = this.particularService.findById(this.particularIdForAllTest);
-		particular.setPhone("064785932");
-		// When
-		this.particularService.update(particular);
-		ParticularDto particularUpdate = this.particularService.findById(this.particularIdForAllTest);
-		// Then
+        ParticularDto particular = new ParticularDto();
 
-		Assert.assertTrue(particularUpdate.getPhone() == "064785932");
-	}
-	
-	
-	@Before
-	public void prepareAllEntityBefore() throws AkdemiaBusinessException {
- 
-		// creation particular
-		ParticularDto particular = new ParticularDto();
-		bcryptEncoder = new BCryptPasswordEncoder();
-		
-		particular.setFirstname("Lamine");
-		particular.setLastname("Bafoil");
-		particular.setGender("H");
-		particular.setActivity("Stagiaire");
-		particular.setHighestDiploma("Master");
-		particular.setBirthDate(new Date());
-		particular.setLogin("lamine");
-		particular.setPassword(this.bcryptEncoder.encode("1234"));
-		particular.setEmail("laminebafoil@gmail.com");
-		particular.setAddress("Paris, France");
-		particular.setPhone("06974582");
-		particular.setCreationDate(new Date());
-		
-		particular = this.particularService.create(particular);
+        particular.setFirstname("Lamine");
+        particular.setLastname("Bafoil");
+        particular.setGender("H");
+        particular.setActivity("Stagiaire");
+        particular.setHighestDiploma("Master");
+        particular.setBirthDate(new Date());
+        particular.setLogin("lamine");
+        particular.setPassword(this.bcryptEncoder.encode("1234"));
+        particular.setEmail("laminebafoil@gmail.com");
+        particular.setAddress("Paris, France");
+        particular.setPhone("06974582");
+        particular.setCreationDate(new Date());
 
-		Assert.assertNotNull(particular.getId());
+        particular = this.particularService.create(particular);
 
-		this.particularIdForAllTest = particular.getId();
-	}
-	
-	@After
-	public void deleteAllEntityAfter() throws AkdemiaBusinessException, AccessDeniedException {
-		if (!Objects.isNull(this.particularIdCreateTest)) {
-			this.particularService.deleteById(this.particularIdForAllTest);
-		}
-		if (!Objects.isNull(this.particularIdCreateTest)) {
-			this.particularService.deleteById(this.particularIdCreateTest);
-		}
-	}
-	
+        Assert.assertNotNull(particular.getId());
+
+        this.particularIdForAllTest = particular.getId();
+    }
+
+    @Test
+    public void testCreateParticularWithSuccess() throws AkdemiaBusinessException {
+
+        ParticularDto particular = new ParticularDto();
+
+        particular.setFirstname("Daria");
+        particular.setLastname("Manuella");
+        particular.setGender("F");
+        particular.setActivity("Stagiaire");
+        particular.setHighestDiploma("Master");
+        particular.setBirthDate(new Date());
+        particular.setLogin("daria");
+        particular.setPassword(this.bcryptEncoder.encode("1234"));
+        particular.setEmail("dariamanuella@gmail.com");
+        particular.setAddress("Paris, France");
+        particular.setPhone("06974582");
+        particular.setCreationDate(new Date());
+
+        particular = this.particularService.create(particular);
+        Assert.assertNotNull(particular.getId());
+
+        this.particularIdCreateTest = particular.getId();
+    }
+
+    @Test
+    public void testFindAllParticularsWithSuccess() {
+        List<ParticularDto> particulars = this.particularService.findAll();
+        Assert.assertTrue(particulars.size() > 0);
+    }
+
+    @Test
+    public void testFindByIdWithSuccess() throws AkdemiaBusinessException {
+        ParticularDto particular = this.particularService.findById(this.particularIdForAllTest);
+        Assert.assertTrue(particular.getId().equals(particularIdForAllTest));
+    }
+
+    @Test
+    public void testDeleteParticularWithSuccess() throws AccessDeniedException, AkdemiaBusinessException {
+        this.particularService.deleteById(this.particularIdForAllTest);
+        ParticularDto particular = this.particularService.findById(this.particularIdForAllTest);
+        Assert.assertNull(particular);
+    }
+
+    @Test
+    public void testUpdateParticular() throws AccessDeniedException, AkdemiaBusinessException {
+        ParticularDto particular = this.particularService.findById(this.particularIdForAllTest);
+        particular.setPhone("064785932");
+        this.particularService.update(particular);
+        ParticularDto particularUpdate = this.particularService.findById(this.particularIdForAllTest);
+        Assert.assertEquals("064785932", particularUpdate.getPhone());
+    }
+
+    @After
+    public void deleteAllEntityAfter() throws AkdemiaBusinessException, AccessDeniedException {
+        if (!Objects.isNull(this.particularIdForAllTest)) {
+            this.particularService.deleteById(this.particularIdForAllTest);
+        }
+        if (!Objects.isNull(this.particularIdCreateTest)) {
+            this.particularService.deleteById(this.particularIdCreateTest);
+        }
+    }
 }
