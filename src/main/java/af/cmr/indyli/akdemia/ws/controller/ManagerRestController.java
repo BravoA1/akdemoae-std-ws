@@ -73,6 +73,7 @@ public class ManagerRestController {
 		if(managerOne == null) {
 			return ResponseEntity.notFound().build(); 
 		}
+		manager.setId(managerId);
 	  
 		ManagerDto updateNewManager =  this.managerService.update(manager);
 	  

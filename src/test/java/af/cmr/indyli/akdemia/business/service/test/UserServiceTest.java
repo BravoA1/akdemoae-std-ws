@@ -51,7 +51,7 @@ public class UserServiceTest {
         Assert.assertNotNull(user.getId());
         this.createUserId = user.getId();
     }
-
+    
     @Test
     public void testFindAllUserWithSuccess() {
         // When
@@ -59,7 +59,7 @@ public class UserServiceTest {
         // Then
         Assert.assertTrue(users.size() > 0);
     }
-
+    
     @Test
     public void testFindByIdWithSuccess() throws AkdemiaBusinessException {
         // Given

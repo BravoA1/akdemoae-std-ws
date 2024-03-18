@@ -52,6 +52,7 @@ public class UserRestController {
 		if(userOne == null) {
 			return ResponseEntity.notFound().build(); 
 		}
+		userACreerView.setId(userId);
 	  
 		UserDto updateNewUser =  this.userService.update(userACreerView);
 	  

@@ -4,9 +4,13 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
+import af.cmr.indyli.akdemia.business.service.test.CompanyServiceTest;
+import af.cmr.indyli.akdemia.business.service.test.EmployeeServiceTest;
 import af.cmr.indyli.akdemia.business.service.test.ParticularServiceTest;
 import af.cmr.indyli.akdemia.business.service.test.RequirementServiceTest;
+import af.cmr.indyli.akdemia.business.service.test.SubThemeServiceTest;
 import af.cmr.indyli.akdemia.business.service.test.ThemeServiceTest;
+import af.cmr.indyli.akdemia.business.service.test.TrainingServiceTest;
 import af.cmr.indyli.akdemia.business.service.test.UserServiceTest;
 
 public class TestRunner {
@@ -18,7 +22,11 @@ public class TestRunner {
         	UserServiceTest.class,
         	ThemeServiceTest.class,
         	RequirementServiceTest.class,
-        	ParticularServiceTest.class
+        	ParticularServiceTest.class,
+        	CompanyServiceTest.class,
+        	EmployeeServiceTest.class,
+        	TrainingServiceTest.class,
+        	SubThemeServiceTest.class
         };
 
         Result result = JUnitCore.runClasses(testClasses);

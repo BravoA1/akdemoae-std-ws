@@ -72,6 +72,7 @@ public class ParticularRestController {
 		if(particularOne == null) {
 			return ResponseEntity.notFound().build(); 
 		}
+		particular.setId(particularId);
 	  
 		ParticularDto updateNewParticular =  this.particularService.update(particular);
 	  
